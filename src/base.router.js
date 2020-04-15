@@ -1,0 +1,5 @@
+class BaseRouter {}
+
+export {
+  BaseRouter
+}
