@@ -1,18 +1,33 @@
 import {
-  HashRouter
-} from '../src/hash.router'
+  HashRouter,
+  HistoryRouter
+} from '../src'
 
-const router = new HashRouter({
-  routes: [
-    {
-      path: '/user',
-      component: '<div>user</div>'
-    },
-    {
-      path: '/center',
-      component: '<div>center</div>'
-    }
-  ]
-})
+const routes = [
+  {
+    path: '/user',
+    component: '<div>user</div>'
+  },
+  {
+    path: '/center',
+    component: '<div>center</div>'
+  }
+]
 
-window.router = router
+function initRouter(mode = 'hash') {
+  let router
+  if (mode === 'hash') {
+    router = new HashRouter({
+      routes
+    })
+  } else {
+    router = new HistoryRouter({
+      routes
+    })
+  }
+
+  window.router = router
+}
+
+
+window.initRouter = initRouter

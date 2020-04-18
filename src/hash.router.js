@@ -5,34 +5,31 @@ class HashRouter {
   } = {}) {
     this.base = base
     this.routes = routes
-    this.current = {
-      route: {},
-      path: '',
-      query: {}
-    }
+    this.current = {}
 
     this.init()
   }
 
   init() {
-    window.addEventListener('hashchange', () => {
-      const record = this.normalizePath()
-      const route = this.match(record.path)
-      if (!route) return
-      record.route = route
-      this.current = record
-      this.render(this.current.route)
-    })
+    const currentLocation = this.getCurrentLocation()
+    console.log(currentLocation)
+    this.transitionTo(currentLocation)
 
-    const record = this.normalizePath()
-    const route = this.match(record.path)
-    if (!route) return
-    record.route = route
-    this.current = record
-    this.render(this.current.route)
+    window.addEventListener('hashchange', () => {
+      const currentLocation = this.getCurrentLocation()
+      this.transitionTo(currentLocation)
+    })
   }
 
-  match(path) {
+  transitionTo(location) {
+    const route = this.match(location)
+    if (!route) return
+    this.current = route
+    this.render(route)
+  }
+
+  match(location) {
+    const {path} = this.normalizePath(location)
     return this.routes.find(_ => _.path === path)
   }
 
@@ -41,8 +38,11 @@ class HashRouter {
     document.body.innerHTML = route.component
   }
 
-  normalizePath() {
-    const path = location.hash.replace('#', '')
+  getCurrentLocation() {
+    return getHash()
+  }
+
+  normalizePath(path) {
     // const queryIndex = location.hash.indexOf('?')
     // const queryString = queryIndex > -1 ? location.hash.slice(queryIndex) : ''
     const query = {}
@@ -72,6 +72,26 @@ class HashRouter {
   forward() {
     window.history.forward()
   }
+}
+
+function getHash() {
+  let href = window.location.href
+
+  const index = href.indexOf('#')
+
+  if (index < 0) return ''
+
+  href = href.slice(index + 1)
+
+  const searchIndex = href.indexOf('?')
+
+  if (searchIndex < 0) {
+    href = decodeURI(href)
+  } else {
+    href = decodeURI(href.slice(0, searchIndex)) + href.slice(searchIndex)
+  }
+
+  return href
 }
 
 export {
